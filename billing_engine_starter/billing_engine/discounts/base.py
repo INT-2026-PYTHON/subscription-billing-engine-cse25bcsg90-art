@@ -32,3 +32,15 @@ class Discount(ABC):
     def apply(self, subtotal: Money, context: DiscountContext) -> Money:
         """Return the non-negative discount amount, capped at subtotal."""
         raise NotImplementedError
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from billing_engine.money import Money
+
+@dataclass(frozen=True)
+class DiscountContext:
+    invoice_count_so_far: int
+
+class Discount(ABC):
+    @abstractmethod
+    def apply(self, subtotal: Money, context: DiscountContext) -> Money:
+        raise NotImplementedError
