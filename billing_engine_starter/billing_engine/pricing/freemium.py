@@ -21,3 +21,11 @@ class Freemium(PricingStrategy):
     def calculate(self, quantity: int) -> Money:
         # TODO Day 1
         raise NotImplementedError("Day 1: implement Freemium.calculate")
+def __init__(self, free_quota: int, overage_strategy: PricingStrategy) -> None:
+    self.free_quota = free_quota
+    self.overage_strategy = overage_strategy
+
+def calculate(self, quantity: int) -> Money:
+    if quantity <= self.free_quota:
+        return Money("0.00", self.overage_strategy.calculate(0).currency)
+    return self.overage_strategy.calculate(quantity - self.free_quota)
