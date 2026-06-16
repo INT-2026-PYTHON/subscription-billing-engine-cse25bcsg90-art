@@ -50,3 +50,4 @@ dp = DunningProcess(invoice)
 print(dp.send_reminder())
 dp.mark_paid()
 print(invoice)
+
