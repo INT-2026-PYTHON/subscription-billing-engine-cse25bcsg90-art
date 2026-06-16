@@ -57,3 +57,50 @@ class InvoiceRenderer:
             - Return the resolved Path.
         """
         raise NotImplementedError("BONUS: implement InvoiceRenderer.render")
+def __init__(self, output_dir: str | Path = "invoices") -> None:
+    self.output_dir = Path(output_dir)
+    self.output_dir.mkdir(parents=True, exist_ok=True)
+
+def render(
+    self,
+    invoice: Invoice,
+    customer: Customer,
+    line_items: Iterable[InvoiceLineItem],
+) -> Path:
+    from reportlab.pdfgen import canvas
+    from reportlab.lib.pagesizes import A4
+
+    file_path = self.output_dir / f"INV-{invoice.id}.pdf"
+    c = canvas.Canvas(str(file_path), pagesize=A4)
+    width, height = A4
+    y = height - 50
+
+    # Example header
+    c.setFont("Helvetica-Bold", 16)
+    c.drawString(50, y, f"INVOICE #{invoice.id}")
+    y -= 30
+    c.setFont("Helvetica", 12)
+    c.drawString(50, y, f"Issued: {invoice.issued_date}")
+    y -= 40
+
+    # Example customer block
+    c.drawString(50, y, f"Customer: {customer.name}")
+    y -= 20
+    c.drawString(50, y, f"Email: {customer.email}")
+    y -= 20
+    c.drawString(50, y, f"Country: {customer.country}")
+    y -= 40
+
+    # Example billing period
+    c.drawString(50, y, f"Billing period: {invoice.period_start} to {invoice.period_end}")
+    y -= 40
+
+    # Example line items
+    c.setFont("Helvetica-Bold", 12)
+    c.drawString(50, y, "Description")
+    c.drawRightString(width - 50, y, "Amount")
+    y -= 20
+    c.setFont("Helvetica", 12)
+    for item in line_items:
+        c.drawString(50, y, item.description)
+        c.drawRightString(width - 50, y, str(item.amount))
