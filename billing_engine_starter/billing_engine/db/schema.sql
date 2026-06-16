@@ -143,3 +143,110 @@ CREATE TABLE IF NOT EXISTS payment_attempts (
     next_retry_at   TEXT
 );
 CREATE INDEX IF NOT EXISTS idx_pa_invoice ON payment_attempts(invoice_id, attempt_no);
+pragma foreign_keys = on;
+
+create table if not exists customers(
+    id integer primary key autoincrement,
+    name text not null,
+    email text not null unique,
+    country_code text not null check(length(country_code)=2),
+    state_code text not null default '',
+    created_at text not null default(datetime('now'))
+);
+
+create table if not exists plans(
+    id integer primary key autoincrement,
+    name text not null,
+    pricing_type text not null check(pricing_type in('flat','tiered','usage','freemium')),
+    billing_period text not null check(billing_period in('monthly','yearly')),
+    currency text not null check(length(currency)=3),
+    config_json text not null default '{}'
+);
+
+create table if not exists plan_tiers(
+    id integer primary key autoincrement,
+    plan_id integer not null references plans(id) on delete cascade,
+    from_units integer not null,
+    to_units integer,
+    unit_price text not null
+);
+create index if not exists idx_plan_tiers_plan on plan_tiers(plan_id);
+
+create table if not exists discounts(
+    id integer primary key autoincrement,
+    code text not null unique,
+    discount_type text not null check(discount_type in('percent','fixed','first_month_free')),
+    value text not null,
+    currency text,
+    valid_until text
+);
+
+create table if not exists subscriptions(
+    id integer primary key autoincrement,
+    customer_id integer not null references customers(id),
+    plan_id integer not null references plans(id),
+    status text not null check(status in('trial','active','past_due','cancelled')),
+    current_period_start text not null,
+    current_period_end text not null,
+    trial_end text,
+    discount_id integer references discounts(id),
+    past_due_since text
+);
+create index if not exists idx_sub_due on subscriptions(status,current_period_end);
+
+create table if not exists usage_records(
+    id integer primary key autoincrement,
+    subscription_id integer not null references subscriptions(id),
+    metric text not null,
+    quantity integer not null,
+    recorded_at text not null default(datetime('now'))
+);
+create index if not exists idx_usage_sub_time on usage_records(subscription_id,recorded_at);
+
+create table if not exists invoices(
+    id integer primary key autoincrement,
+    subscription_id integer not null references subscriptions(id),
+    period_start text not null,
+    period_end text not null,
+    currency text not null,
+    subtotal text not null,
+    discount_total text not null,
+    tax_total text not null,
+    total text not null,
+    status text not null check(status in('draft','issued','paid','failed','void')),
+    issued_at text,
+    pdf_path text,
+    unique(subscription_id,period_start)
+);
+
+create table if not exists invoice_line_items(
+    id integer primary key autoincrement,
+    invoice_id integer not null references invoices(id) on delete cascade,
+    description text not null,
+    amount text not null,
+    kind text not null check(kind in('base','usage','discount','tax','proration_credit','proration_charge'))
+);
+create index if not exists idx_lineitems_invoice on invoice_line_items(invoice_id);
+
+create table if not exists ledger_entries(
+    id integer primary key autoincrement,
+    invoice_id integer references invoices(id),
+    customer_id integer not null references customers(id),
+    amount text not null,
+    currency text not null,
+    direction text not null check(direction in('debit','credit')),
+    reason text not null,
+    created_at text not null default(datetime('now'))
+);
+create index if not exists idx_ledger_customer on ledger_entries(customer_id,created_at);
+
+create table if not exists payment_attempts(
+    id integer primary key autoincrement,
+    invoice_id integer not null references invoices(id),
+    attempt_no integer not null,
+    status text not null check(status in('success','failed')),
+    failure_reason text,
+    attempted_at text not null default(datetime('now')),
+    next_retry_at text
+);
+create index if not exists idx_pa_invoice on payment_attempts(invoice_id,attempt_no);
