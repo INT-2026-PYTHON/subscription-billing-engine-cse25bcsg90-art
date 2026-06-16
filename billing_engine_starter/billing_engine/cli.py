@@ -76,3 +76,37 @@ def run_demo() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
+def format_invoice_text(invoice: Invoice, customer_name: str, plan_name: str) -> str:
+    lines = []
+    lines.append(f"INVOICE #{invoice.id}")
+    lines.append("=" * 60)
+    lines.append(f"Customer: {customer_name}")
+    lines.append(f"Plan:     {plan_name}")
+    lines.append(f"Period:   {invoice.period_start} to {invoice.period_end}")
+    lines.append("-" * 60)
+    for item in invoice.line_items:
+        lines.append(f"{item.description:<40} ₹ {item.amount:>10}")
+    lines.append("-" * 60)
+    lines.append(f"TOTAL{'':<42} ₹ {invoice.total:>10}")
+    lines.append(f"Status: {invoice.status}")
+    return "\n".join(lines)
+
+
+def run_demo() -> int:
+    print("Running demo scenario...")
+    print("Creating customer, subscribing, generating invoice...")
+    return 0
+
+
+def cmd_init(args): print("Initializing database...")
+def cmd_customer_add(args): print(f"Adding customer {args.name} ({args.email}, {args.country})")
+def cmd_plan_list(args): print("Listing plans...")
+def cmd_subscribe(args): print(f"Subscribing customer {args.customer_id} to plan {args.plan_id}")
+def cmd_bill_run(args): print(f"Running billing for date {args.date}")
+def cmd_invoice_show(args): print(f"Showing invoice {args.invoice_id}")
+def cmd_upgrade(args): print(f"Upgrading subscription {args.subscription_id} to plan {args.new_plan_id}")
+def cmd_demo(args): return run_demo()
+
+
+args = parser.parse_args(argv)
+return args.func(args)
