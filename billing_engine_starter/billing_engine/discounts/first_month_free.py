@@ -14,3 +14,9 @@ class FirstMonthFree(Discount):
     def apply(self, subtotal: Money, context: DiscountContext) -> Money:
         # TODO Day 1
         raise NotImplementedError("Day 1: implement FirstMonthFree.apply")
+from billing_engine.money import Money
+from billing_engine.discounts.base import Discount, DiscountContext
+
+class FirstMonthFree(Discount):
+    def apply(self, subtotal: Money, context: DiscountContext) -> Money:
+        return subtotal if context.invoice_count_so_far == 0 else Money("0.00", subtotal.currency)
