@@ -13,3 +13,15 @@ class Customer:
     country_code: str            # "IN", "DE", "US", ...
     state_code: str = ""         # e.g. "MH" for Maharashtra; "" if N/A
     created_at: Optional[datetime] = None
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional
+
+@dataclass(frozen=True)
+class Customer:
+    id: Optional[int]
+    name: str
+    email: str
+    country_code: str
+    state_code: str = ""
+    created_at: Optional[datetime] = None
