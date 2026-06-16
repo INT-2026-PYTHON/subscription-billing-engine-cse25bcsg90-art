@@ -75,7 +75,6 @@ def render(
     width, height = A4
     y = height - 50
 
-    # Example header
     c.setFont("Helvetica-Bold", 16)
     c.drawString(50, y, f"INVOICE #{invoice.id}")
     y -= 30
@@ -83,7 +82,6 @@ def render(
     c.drawString(50, y, f"Issued: {invoice.issued_date}")
     y -= 40
 
-    # Example customer block
     c.drawString(50, y, f"Customer: {customer.name}")
     y -= 20
     c.drawString(50, y, f"Email: {customer.email}")
@@ -91,11 +89,10 @@ def render(
     c.drawString(50, y, f"Country: {customer.country}")
     y -= 40
 
-    # Example billing period
     c.drawString(50, y, f"Billing period: {invoice.period_start} to {invoice.period_end}")
     y -= 40
 
-    # Example line items
+    
     c.setFont("Helvetica-Bold", 12)
     c.drawString(50, y, "Description")
     c.drawRightString(width - 50, y, "Amount")
