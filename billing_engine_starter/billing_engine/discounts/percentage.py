@@ -20,3 +20,16 @@ class PercentageDiscount(Discount):
     def apply(self, subtotal: Money, context: DiscountContext) -> Money:
         # TODO Day 1
         raise NotImplementedError("Day 1: implement PercentageDiscount.apply")
+from decimal import Decimal
+from billing_engine.money import Money
+from billing_engine.discounts.base import Discount, DiscountContext
+
+class PercentageDiscount(Discount):
+    def __init__(self, percentage: Decimal) -> None:
+        self.percentage = percentage
+
+    def apply(self, subtotal: Money, context: DiscountContext) -> Money:
+        discount_value = subtotal.amount * self.percentage
+        if discount_value > subtotal.amount:
+            discount_value = subtotal.amount
+        return Money(str(discount_value), subtotal.currency)
