@@ -38,9 +38,9 @@ class BillingCycle:
         invoice_repo: InvoiceRepository,
         line_item_repo: InvoiceLineItemRepository,
         ledger_repo: LedgerRepository,
-        strategy_factory: Callable,    # given a Plan, returns a PricingStrategy
-        discount_factory: Callable,    # given a discount_id or None, returns a Discount or None
-        tax_factory: Callable,         # given a Customer, returns (TaxCalculator, TaxContext)
+        strategy_factory: Callable,   
+        discount_factory: Callable,  
+        tax_factory: Callable,        
     ) -> None:
         self.db = db
         self.customer_repo = customer_repo
@@ -53,15 +53,10 @@ class BillingCycle:
         self.strategy_factory = strategy_factory
         self.discount_factory = discount_factory
         self.tax_factory = tax_factory
-
-    # --------------------------------------------------------
     def run(self, as_of: date) -> BillingResult:
         """Bill all subscriptions whose current period ends on or before `as_of`."""
-        # TODO Day 3
         raise NotImplementedError("Day 3: implement BillingCycle.run")
-
-    # --------------------------------------------------------
     def upgrade_subscription(self, subscription_id: int, new_plan_id: int, switch_date: date) -> None:
         """Mid-cycle upgrade — Day 4 stretch."""
-        # TODO Day 4
         raise NotImplementedError("Day 4: implement BillingCycle.upgrade_subscription")
+
